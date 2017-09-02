@@ -1,9 +1,9 @@
 # Popular Movie Stage 2
 
 This is second project for the Udacity **Android Developer Fast Track** supported by Google. The project meet the requested specifications and it's implemented with high level libraries such as:
-1. Piccaso, an easy and powerful library to manage images from the web.
-2. Retrofit, a modern, fast and efficient REST client.
-3. Butterknife to inject views.
+1. **Piccaso**, an easy and powerful library to manage images from the web.
+2. **Retrofit**, a modern, fast and efficient REST client.
+3. **Butterknife** to inject views.
 
 
 #### Common Project Requirements
