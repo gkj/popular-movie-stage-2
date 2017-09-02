@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Popular Movie Stage 2</string>
+    <string name="authority">com.gilangkusumajati.popularmoviestage2.database.provider</string>
+    <string name="most_popular">Most Popular</string>
+    <string name="top_rated">Highest Rated</string>
+    <string name="favorite">Favorite</string>
+    <string name="no_internet_connection">No Internet connection</string>
+    <string name="title">Title</string>
+    <string name="release_date">Release Date</string>
+    <string name="vote_average">Vote Average</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="reviews">Review</string>
+    <string name="no_reviews">No reviews available.</string>
+    <string name="trailers">Trailers</string>
+    <string name="no_trailers">No trailers available.</string>
+    <string name="unfavorite">Unfavorite</string>
+    <string name="share">Share</string>
+    <string name="no_favorite_movie">You do not have any favorited movie.</string>
+    <string name="cannot_get_movie">Cannot get movies. Please check your internet connection.</string>
+    <string name="cannot_get_review">Cannot get reviews. Please check your internet connection.</string>
+    <string name="cannot_get_trailer">Cannot get trailers. Please check your internet connection.</string>
+    <string name="movie_favorited">%1$s add to favorites.</string>
+    <string name="movie_unfavorited">%1$s remove from favorites.</string>
+
+
+    <string name="sample_title" translatable="false">Dunkirk</string>
+    <string name="sample_release_date" translatable="false">20 January 2017</string>
+    <string name="sample_rating" translatable="false">4.9</string>
+    <string name="sample_total_vote" translatable="false">89000</string>
+    <string name="sample_auhtor" translatable="false">Gilang Kusuma Jati</string>
+    <string name="sample_content" translatable="false">For me this film is the mpst underrated right after The Last Samurai. Both are STUNNING artistically.</string>
+    <string name="sample_overview" translatable="false">Diangkat dari kisah nyata. Di bulan Mei 1940, pasukan Jerman memasuki Prancis, membuat pasukan sekutu terperangkap di pantai daerah Dunkirk. Dengan bantuan melalui darat dan udara dari pasukan Inggris dan Prancis, para tentara dievakuasi secara perlahan dan terencana dari pantai menggunakan semua armada angkatan laut dan sipil yang ada.</string>
+</resources>
