@@ -15,6 +15,7 @@ import com.gilangkusumajati.popularmoviestage2.model.MovieReview;
 import com.gilangkusumajati.popularmoviestage2.model.MovieTrailer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class DBUtil {
 
     private static final String TAG = DBUtil.class.getSimpleName();
 
-    public static List<Movie> getMovies(@NonNull final ContentResolver contentResolver) {
+    public static List<Movie> getFavoritedMovies(@NonNull final ContentResolver contentResolver) {
 
         Cursor cursor = contentResolver.query(MovieContract.MovieEntry.CONTENT_URI,
                 null,
@@ -257,5 +258,36 @@ public class DBUtil {
         // insert new data
         int reviewInserted = resolver.bulkInsert(ReviewContract.ReviewEntry.CONTENT_URI, values);
         Log.d(TAG, "Review Inserted : " + reviewInserted);
+    }
+
+    public static Uri favoriteMovie(@NonNull final ContentResolver resolver, @NonNull final Movie movie) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_VIDEO, movie.hasVideo() ? 1 : 0);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+
+        Integer[] temp = movie.getGenreIds().toArray(new Integer[movie.getGenreIds().size()]);
+        String genreIds = Arrays.toString(temp);
+        genreIds = genreIds.substring(1, genreIds.length() - 1);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_GENRE_IDS, genreIds);
+
+        contentValues.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_ADULT, movie.getAdult() ? 1 : 0);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+
+        return resolver.insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+    }
+
+    public static int unfavoriteMovie(@NonNull final ContentResolver resolver, @NonNull final Movie movie) {
+        int id = movie.getMovieId();
+        Uri uri = MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+        return resolver.delete(uri, null, null);
     }
 }

@@ -124,11 +124,13 @@ public class MovieDetailFragment extends Fragment implements
         unbinder = ButterKnife.bind(this, rootView);
 
         trailerRecyclerView.setHasFixedSize(true);
+        trailerRecyclerView.setNestedScrollingEnabled(false);
         trailerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         movieTrailerAdapter = new MovieTrailerAdapter(this);
         trailerRecyclerView.setAdapter(movieTrailerAdapter);
 
         reviewRecyclerView.setHasFixedSize(true);
+        reviewRecyclerView.setNestedScrollingEnabled(false);
         reviewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         movieReviewAdapter = new MovieReviewAdapter(this);
         reviewRecyclerView.setAdapter(movieReviewAdapter);
@@ -222,67 +224,55 @@ public class MovieDetailFragment extends Fragment implements
         return movie.getRowId() != -1;
     }
 
-    private void favoriteMovie(MenuItem item) {
-        ContentResolver resolver = getActivity().getContentResolver();
+    private void favoriteMovie(final MenuItem item) {
 
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_VIDEO, movie.hasVideo() ? 1 : 0);
-        contentValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+        new AsyncTask<Void, Void, Uri>() {
 
-        Integer[] temp = movie.getGenreIds().toArray(new Integer[movie.getGenreIds().size()]);
-        String genreIds = Arrays.toString(temp);
-        genreIds = genreIds.substring(1, genreIds.length() - 1);
-        contentValues.put(MovieContract.MovieEntry.COLUMN_GENRE_IDS, genreIds);
+            @Override
+            protected Uri doInBackground(Void... params) {
+                ContentResolver contentResolver = getActivity().getContentResolver();
 
-        contentValues.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_ADULT, movie.getAdult() ? 1 : 0);
-        contentValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
-        contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+                Uri uri = DBUtil.favoriteMovie(contentResolver, movie);
 
-        Uri uri = resolver.insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+                if (result != null) {
+                    DBUtil.updateReviewsToDB(contentResolver, movie, result.reviews);
+                    DBUtil.updateTrailersToDB(contentResolver, movie, result.trailers);
+                }
 
-        if (uri != null) {
-            String id = uri.getLastPathSegment();
-            movie.setRowId(Integer.parseInt(id));
-            item.setIcon(R.drawable.ic_favorited);
-            resolver.notifyChange(uri, null);
-        }
+                return uri;
+            }
 
-        if (result != null) {
-            ContentResolver contentResolver = getActivity().getContentResolver();
-
-            DBUtil.updateReviewsToDB(contentResolver, movie, result.reviews);
-            DBUtil.updateTrailersToDB(contentResolver, movie, result.trailers);
-        }
+            @Override
+            protected void onPostExecute(Uri uri) {
+                if (uri != null)
+                {
+                    String id = uri.getLastPathSegment();
+                    movie.setRowId(Integer.parseInt(id));
+                    item.setIcon(R.drawable.ic_favorited);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
     }
 
-    private void unfavoriteMovie(MenuItem item) {
-        int id = movie.getMovieId();
-        Uri uri = MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
-
-        ContentResolver resolver = getActivity().getContentResolver();
-        int totalMovieDeleted = resolver.delete(uri, null, null);
-
-        if (totalMovieDeleted == 1) {
-            movie.setRowId(-1);
-            item.setIcon(R.drawable.ic_unfavorited);
-        }
-
+    private void unfavoriteMovie(final MenuItem item) {
         new AsyncTask<Void, Void, Void>() {
+            int totalMovieDeleted;
+
             @Override
             protected Void doInBackground(Void... params) {
                 ContentResolver contentResolver = getActivity().getContentResolver();
+                totalMovieDeleted = DBUtil.unfavoriteMovie(contentResolver, movie);
                 DBUtil.deleteReviewFromDB(contentResolver, movie);
                 DBUtil.deleteTrailerFromDB(contentResolver, movie);
-
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (totalMovieDeleted == 1) {
+                    movie.setRowId(-1);
+                    item.setIcon(R.drawable.ic_unfavorited);
+                }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
     }

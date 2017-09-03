@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             protected void onStartLoading() {
                 showProgressIndicator();
+                errorMessageTextView.setVisibility(View.INVISIBLE);
                 forceLoad();
             }
 
@@ -192,8 +193,7 @@ public class MainActivity extends AppCompatActivity
                     MovieMenu movieMenu = PreferenceUtil.getSelectedMenu(MainActivity.this);
 
                     if (movieMenu == MovieMenu.FAVORITE) {
-                        return DBUtil.getMovies(getContentResolver());
-
+                        return DBUtil.getFavoritedMovies(getContentResolver());
                     } else {
                         Call<MovieResponse> call = movieMenu == MovieMenu.POPULAR ?
                                 MovieAPIClient.getInstance().getPopularMovie() :
